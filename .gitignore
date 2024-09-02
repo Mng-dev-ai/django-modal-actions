@@ -1,0 +1,14 @@
+*.pyc
+__pycache__
+.DS_Store
+.coverage
+.tox/
+*.db
+*sqlite
+.venv
+.idea
+.env
+build/*
+dist/*
+*.egg-info
+.DS_Store

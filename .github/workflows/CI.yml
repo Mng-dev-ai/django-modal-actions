@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+      - name: Run Ruff
+        run: ruff check .
+      - name: Run Ruff Format
+        run: ruff format --check .
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.7, 3.8, 3.9, "3.10"]
+        django-version: [3.2, 4.0, 4.1, 4.2]
+        exclude:
+          # Django 4.0+ requires Python 3.8+
+          - python-version: 3.7
+            django-version: 4.0
+          - python-version: 3.7
+            django-version: 4.1
+          - python-version: 3.7
+            django-version: 4.2
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "Django==${{ matrix.django-version }}.*"
+          python -m pip install selenium webdriver-manager
+      - name: Run Tests
+        run: |
+          python -m unittest discover django_modal_actions/tests
