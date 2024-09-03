@@ -18,10 +18,10 @@
 </div>
 <div class="dma-modal-footer">
   {% if form %}
-  <button type="submit" form="dma-modal-form" class="button default">
+  <button type="submit" form="dma-modal-form" class="dma-button default">
     Confirm
   </button>
-  <button class="button cancel">Cancel</button>
+  <button class="dma-button cancel">Cancel</button>
   {% else %}
   <form
     method="post"
@@ -30,8 +30,8 @@
     {% csrf_token %} {% if selected_ids %}
     <input type="hidden" name="selected_ids" value="{{ selected_ids }}" />
     {% endif %}
-    <button type="submit" class="button default">Confirm</button>
-    <button class="button cancel">Cancel</button>
+    <button type="submit" class="dma-button default">Confirm</button>
+    <button class="dma-button cancel">Cancel</button>
   </form>
   {% endif %}
 </div>
