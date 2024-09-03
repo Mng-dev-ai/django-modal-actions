@@ -127,7 +127,7 @@ class ModalActionMixin:
                     )
                 buttons.append(
                     format_html(
-                        '<a class="historylink modal-action-button" href="{}">{}</a>',
+                        '<a class="historylink dma-modal-action-button" href="{}">{}</a>',
                         url,
                         getattr(
                             func, "short_description", action.replace("_", " ").upper()

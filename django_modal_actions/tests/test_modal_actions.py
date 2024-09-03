@@ -99,7 +99,7 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         self.submit_form("bad")
 
         error_list = WebDriverWait(self.selenium, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "errorlist"))
+            EC.presence_of_element_located((By.CLASS_NAME, "dma-errorlist"))
         )
         self.assertIn("Name cannot be 'bad'", error_list.text)
 
