@@ -174,11 +174,8 @@
 .dma-errorlist {
   color: var(--error-fg);
   background: var(--error-bg);
-  border: 1px solid var(--error-fg);
   margin: 0 0 10px;
   padding: 10px;
-  border-radius: 4px;
-  list-style-type: none;
 }
 
 .dma-errorlist li {
