@@ -1,11 +1,11 @@
 (function ($) {
   $(document).ready(function () {
     var $modal = $(
-      '<div id="modal-action" class="modal"><div class="modal-content"></div></div>',
+      '<div id="dma-modal-action" class="dma-modal"><div class="dma-modal-content"></div></div>',
     ).appendTo("body");
-    var $modalContent = $modal.find(".modal-content");
+    var $modalContent = $modal.find(".dma-modal-content");
 
-    $(document).on("click", ".modal-action-button", function (e) {
+    $(document).on("click", ".dma-modal-action-button", function (e) {
       e.preventDefault();
       var url = $(this).attr("href");
       var isListAction = url.includes("list-modal-action");
@@ -25,7 +25,7 @@
 
     $(document).on(
       "click",
-      "#modal-action .cancel, #modal-action .modal-close",
+      "#dma-modal-action .cancel, #dma-modal-action .dma-modal-close",
       function (e) {
         e.preventDefault();
         $modal.hide();
@@ -33,18 +33,18 @@
     );
 
     function displayErrors(errors) {
-      $(".errorlist, .alert-danger").remove();
+      $(".dma-errorlist, .dma-alert-danger").remove();
 
       $.each(errors, function (field, messages) {
         if (field === "__all__") {
           var $generalError = $(
-            '<div class="alert alert-danger" role="alert"></div>',
+            '<div class="dma-alert dma-alert-danger" role="alert"></div>',
           );
           $generalError.text(messages.join(" "));
-          $("#modal-action form").prepend($generalError);
+          $("#dma-modal-action form").prepend($generalError);
         } else {
           var $field = $("#id_" + field);
-          var $errorList = $('<ul class="errorlist"></ul>');
+          var $errorList = $('<ul class="dma-errorlist"></ul>');
           $.each(messages, function (index, message) {
             $errorList.append($("<li></li>").text(message));
           });
@@ -54,13 +54,13 @@
 
       if (Object.keys(errors).length > 0 && !errors.hasOwnProperty("__all__")) {
         var $generalError = $(
-          '<div class="alert alert-danger" role="alert">Please correct the errors below.</div>',
+          '<div class="dma-alert dma-alert-danger" role="alert">Please correct the errors below.</div>',
         );
-        $("#modal-action form").prepend($generalError);
+        $("#dma-modal-action form").prepend($generalError);
       }
     }
 
-    $(document).on("submit", "#modal-action form", function (e) {
+    $(document).on("submit", "#dma-modal-action form", function (e) {
       e.preventDefault();
       var form = $(this);
       var url = form.attr("action");
@@ -94,7 +94,7 @@
     });
 
     $(window).on("click", function (e) {
-      if ($(e.target).is(".modal")) {
+      if ($(e.target).is(".dma-modal")) {
         $modal.hide();
       }
     });

@@ -1,4 +1,4 @@
-.modal {
+.dma-modal {
   display: none;
   position: fixed;
   z-index: 9999;
@@ -12,7 +12,7 @@
   transition: opacity 0.3s ease;
 }
 
-.modal-content {
+.dma-modal-content {
   background-color: var(--body-bg);
   color: var(--body-fg);
   margin: 10% auto;
@@ -20,10 +20,10 @@
   max-width: 500px;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: modal-appear 0.3s ease-out;
+  animation: dma-modal-appear 0.3s ease-out;
 }
 
-@keyframes modal-appear {
+@keyframes dma-modal-appear {
   from {
     opacity: 0;
     transform: translateY(-20px);
@@ -34,7 +34,7 @@
   }
 }
 
-.modal-header {
+.dma-modal-header {
   background-color: var(--primary);
   color: var(--header-link-color);
   padding: 15px 20px;
@@ -45,13 +45,13 @@
   border-top-right-radius: 8px;
 }
 
-.modal-header h2 {
+.dma-modal-header h2 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 500;
 }
 
-.modal-close {
+.dma-modal-close {
   color: var(--header-link-color);
   background: none;
   border: none;
@@ -63,19 +63,19 @@
     transform 0.15s;
 }
 
-.modal-close:hover,
-.modal-close:focus {
+.dma-modal-close:hover,
+.dma-modal-close:focus {
   opacity: 1;
   transform: scale(1.1);
 }
 
-.modal-body {
+.dma-modal-body {
   padding: 20px;
   font-size: 0.9rem;
   line-height: 1.6;
 }
 
-.modal-footer {
+.dma-modal-footer {
   background-color: var(--darkened-bg);
   padding: 15px 20px;
   text-align: right;
@@ -83,9 +83,9 @@
   border-bottom-right-radius: 8px;
 }
 
-.button,
-.modal-action-button,
-.modal-footer .button {
+.dma-button,
+.dma-modal-action-button,
+.dma-modal-footer .dma-button {
   background-color: var(--button-bg);
   color: var(--button-fg);
   border: 1px solid var(--button-border);
@@ -99,58 +99,58 @@
   transition: all 0.2s ease;
 }
 
-.button:hover,
-.modal-action-button:hover,
-.modal-footer .button:hover {
+.dma-button:hover,
+.dma-modal-action-button:hover,
+.dma-modal-footer .dma-button:hover {
   background-color: var(--button-hover-bg);
   transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.button:active,
-.modal-action-button:active,
-.modal-footer .button:active {
+.dma-button:active,
+.dma-modal-action-button:active,
+.dma-modal-footer .dma-button:active {
   transform: translateY(0);
   box-shadow: none;
 }
 
-.button.default,
-.modal-action-button.default,
-.modal-footer .button.default {
+.dma-button.default,
+.dma-modal-action-button.default,
+.dma-modal-footer .dma-button.default {
   background-color: var(--default-button-bg);
   border-color: var(--default-button-border);
 }
 
-.button.default:hover,
-.modal-action-button.default:hover,
-.modal-footer .button.default:hover {
+.dma-button.default:hover,
+.dma-modal-action-button.default:hover,
+.dma-modal-footer .dma-button.default:hover {
   background-color: var(--default-button-hover-bg);
 }
 
-.modal-footer .button + .button {
+.dma-modal-footer .dma-button + .dma-button {
   margin-left: 10px;
 }
 
-.modal-action-button.historylink {
+.dma-modal-action-button.historylink {
   background-image: none;
   padding-left: 15px;
 }
 
-#modal-action form p {
+#dma-modal-action form p {
   margin-bottom: 20px;
 }
 
-#modal-action form label {
+#dma-modal-action form label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
   color: var(--body-quiet-color);
 }
 
-#modal-action form input[type="text"],
-#modal-action form input[type="email"],
-#modal-action form select,
-#modal-action form textarea {
+#dma-modal-action form input[type="text"],
+#dma-modal-action form input[type="email"],
+#dma-modal-action form select,
+#dma-modal-action form textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--border-color);
@@ -162,89 +162,86 @@
     box-shadow 0.2s;
 }
 
-#modal-action form input[type="text"]:focus,
-#modal-action form input[type="email"]:focus,
-#modal-action form select:focus,
-#modal-action form textarea:focus {
+#dma-modal-action form input[type="text"]:focus,
+#dma-modal-action form input[type="email"]:focus,
+#dma-modal-action form select:focus,
+#dma-modal-action form textarea:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
 }
 
-.errorlist {
+.dma-errorlist {
   color: var(--error-fg);
   background: var(--error-bg);
-  border: 1px solid var(--error-fg);
   margin: 0 0 10px;
   padding: 10px;
-  border-radius: 4px;
-  list-style-type: none;
 }
 
-.errorlist li {
+.dma-errorlist li {
   font-size: 0.85rem;
   margin-bottom: 5px;
 }
 
-.errorlist li:last-child {
+.dma-errorlist li:last-child {
   margin-bottom: 0;
 }
 
-.alert {
+.dma-alert {
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid transparent;
   border-radius: 4px;
 }
 
-.alert-danger {
+.dma-alert-danger {
   color: var(--error-fg);
   background-color: var(--error-bg);
   border-color: var(--error-fg);
 }
 
-.modal-close:focus-visible,
-.button:focus-visible,
-.modal-action-button:focus-visible {
+.dma-modal-close:focus-visible,
+.dma-button:focus-visible,
+.dma-modal-action-button:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
 @media (prefers-color-scheme: dark) {
-  .modal-content {
+  .dma-modal-content {
     box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
   }
 
-  #modal-action form input[type="text"],
-  #modal-action form input[type="email"],
-  #modal-action form select,
-  #modal-action form textarea {
+  #dma-modal-action form input[type="text"],
+  #dma-modal-action form input[type="email"],
+  #dma-modal-action form select,
+  #dma-modal-action form textarea {
     background-color: var(--body-bg);
     color: var(--body-fg);
   }
 }
 
 @media (max-width: 767px) {
-  .modal-content {
+  .dma-modal-content {
     width: 95%;
     margin: 5% auto;
   }
 
-  .modal-header h2 {
+  .dma-modal-header h2 {
     font-size: 1.1rem;
   }
 
-  .modal-body {
+  .dma-modal-body {
     padding: 15px;
   }
 
-  .modal-footer {
+  .dma-modal-footer {
     padding: 12px 15px;
   }
 
-  .button,
-  .modal-action-button,
-  .modal-footer .button {
+  .dma-button,
+  .dma-modal-action-button,
+  .dma-modal-footer .dma-button {
     padding: 8px 12px;
     font-size: 0.8rem;
   }
