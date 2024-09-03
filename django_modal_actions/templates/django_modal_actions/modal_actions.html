@@ -1,12 +1,12 @@
-<div class="modal-header">
+<div class="dma-modal-header">
   <h2>{{ action_name }}</h2>
-  <button class="modal-close">&times;</button>
+  <button class="dma-modal-close">&times;</button>
 </div>
-<div class="modal-body">
+<div class="dma-modal-body">
   <p>{{ description }}</p>
   {% if form %}
   <form
-    id="modal-form"
+    id="dma-modal-form"
     method="post"
     action="{% if object %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_action' object.pk action %}{% else %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_list_action' action %}{% endif %}"
   >
@@ -16,9 +16,9 @@
   </form>
   {% endif %}
 </div>
-<div class="modal-footer">
+<div class="dma-modal-footer">
   {% if form %}
-  <button type="submit" form="modal-form" class="button default">
+  <button type="submit" form="dma-modal-form" class="button default">
     Confirm
   </button>
   <button class="button cancel">Cancel</button>

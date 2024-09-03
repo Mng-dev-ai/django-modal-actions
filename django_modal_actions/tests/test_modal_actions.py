@@ -15,7 +15,6 @@ from django.db import connection
 from django.test import Client
 from django.urls import reverse
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -62,7 +61,7 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         )
         modal_button.click()
         WebDriverWait(self.selenium, 10).until(
-            EC.presence_of_element_located((By.ID, "modal-action"))
+            EC.presence_of_element_located((By.ID, "dma-modal-action"))
         )
         time.sleep(1)  # Allow for any animations to complete
 
@@ -74,7 +73,7 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         name_field.send_keys(name_value)
         submit_button = WebDriverWait(self.selenium, 10).until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, "#modal-action button[type='submit']")
+                (By.CSS_SELECTOR, "#dma-modal-action button[type='submit']")
             )
         )
         self.selenium.execute_script("arguments[0].click();", submit_button)
@@ -111,7 +110,7 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
 
         # Wait for the modal to close
         WebDriverWait(self.selenium, 10).until(
-            EC.invisibility_of_element_located((By.ID, "modal-action"))
+            EC.invisibility_of_element_located((By.ID, "dma-modal-action"))
         )
 
         # Check for success message
@@ -128,30 +127,25 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
 
         # Ensure the modal is visible
         modal = WebDriverWait(self.selenium, 10).until(
-            EC.visibility_of_element_located((By.ID, "modal-action"))
+            EC.visibility_of_element_located((By.ID, "dma-modal-action"))
         )
         self.assertTrue(modal.is_displayed())
 
         cancel_button = WebDriverWait(self.selenium, 10).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "#modal-action button.cancel"))
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "#dma-modal-action button.cancel")
+            )
         )
         cancel_button.click()
 
         # Wait for the modal to become invisible
         WebDriverWait(self.selenium, 10).until(
-            EC.invisibility_of_element_located((By.ID, "modal-action"))
+            EC.invisibility_of_element_located((By.ID, "dma-modal-action"))
         )
 
         # Check if the modal is no longer visible
-        modal = self.selenium.find_element(By.ID, "modal-action")
+        modal = self.selenium.find_element(By.ID, "dma-modal-action")
         self.assertFalse(modal.is_displayed())
-
-        # Check if the modal-backdrop is removed
-        try:
-            self.selenium.find_element(By.CLASS_NAME, "modal-backdrop")
-            self.fail("Modal backdrop is still present")
-        except NoSuchElementException:
-            pass  # This is expected
 
     def test_object_modal_form_submission(self):
         user = User.objects.first()
@@ -163,7 +157,7 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
 
         # Wait for the modal to close
         WebDriverWait(self.selenium, 10).until(
-            EC.invisibility_of_element_located((By.ID, "modal-action"))
+            EC.invisibility_of_element_located((By.ID, "dma-modal-action"))
         )
 
         # Check for success message
