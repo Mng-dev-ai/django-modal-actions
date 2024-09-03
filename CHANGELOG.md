@@ -3,3 +3,9 @@
 ---
 
 Initial release!
+
+## Version 0.1.1 (September 03, 2024)
+
+---
+
+- refactor: Prefix class names with 'dma-' for package uniqueness.
