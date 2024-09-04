@@ -1,12 +1,6 @@
 {% extends "admin/change_list.html" %}
 
-{% block object-tools %}
-    <ul class="object-tools">
-        {% block object-tools-items %}
-            {{ block.super }}
-            {% if list_modal_action_buttons %}
-                <li>{{ list_modal_action_buttons }}</li>
-            {% endif %}
-        {% endblock %}
-    </ul>
+{% block object-tools-items %}
+    {{ block.super }}
+    {% include "django_modal_actions/modal_actions_buttons.html" %}
 {% endblock %}
