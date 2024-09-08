@@ -9,3 +9,9 @@ Initial release!
 ---
 
 - refactor: Prefix class names with 'dma-' for package uniqueness.
+
+## Version 0.1.2 (September 08, 2024)
+
+---
+
+- chore(docs): Update folder structure and README.md.
