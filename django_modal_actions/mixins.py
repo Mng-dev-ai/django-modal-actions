@@ -12,8 +12,8 @@ from django.utils.html import format_html
 class ModalActionMixin:
     modal_actions: List[str] = []
     list_modal_actions: List[str] = []
-    change_form_template: str = "django_modal_actions/change_form.html"
-    change_list_template: str = "django_modal_actions/change_list.html"
+    change_form_template: str = "admin/django_modal_actions/change_form.html"
+    change_list_template: str = "admin/django_modal_actions/change_list.html"
 
     def get_urls(self) -> List[path]:
         urls: List[path] = super().get_urls()
@@ -73,7 +73,7 @@ class ModalActionMixin:
             "selected_ids": json.dumps(selected_ids) if obj is None else None,
         }
         content = render_to_string(
-            "django_modal_actions/modal_actions.html", context, request
+            "admin/django_modal_actions/modal_actions.html", context, request
         )
         return JsonResponse({"content": content})
 
