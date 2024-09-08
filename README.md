@@ -151,6 +151,70 @@ def approve(self, request, obj, form_data=None):
 
 In this case, the user must both have the `can_approve_items` permission and be a staff member to see and use the approve action.
 
+## Custom Admin Templates
+
+If you need to customize the admin templates while still using the modal actions, you can override the `change_form_template` and `change_list_template` in your ModelAdmin class. Here's how to do it:
+
+1. In your `admin.py`, add the `change_form_template` or `change_list_template` attribute to your ModelAdmin class:
+
+   ```python
+   @admin.register(YourModel)
+   class YourModelAdmin(ModalActionMixin, admin.ModelAdmin):
+       change_form_template = 'admin/yourapp/yourmodel/change_form.html'
+       change_list_template = 'admin/yourapp/yourmodel/change_list.html'
+       # ... rest of your ModelAdmin code
+   ```
+
+2. Create the custom template files in your app's template directory. For example:
+   
+   ```
+   yourapp/
+   └── templates/
+       └── admin/
+           └── yourapp/
+               └── yourmodel/
+                   ├── change_form.html
+                   └── change_list.html
+   ```
+
+3. In your custom templates, extend the default admin templates and add the modal action buttons. Here's an example for `change_form.html`:
+
+   ```html
+   {% extends "admin/change_form.html" %}
+   {% load i18n admin_urls %}
+
+   {% block object-tools %}
+       <ul class="object-tools">
+           {% block object-tools-items %}
+               {{ block.super }}
+               {% if modal_action_buttons %}
+                   <li>{{ modal_action_buttons }}</li>
+               {% endif %}
+           {% endblock %}
+       </ul>
+   {% endblock %}
+   ```
+
+   And for `change_list.html`:
+
+   ```html
+   {% extends "admin/change_list.html" %}
+   {% load i18n admin_urls %}
+
+   {% block object-tools %}
+       <ul class="object-tools">
+           {% block object-tools-items %}
+               {{ block.super }}
+               {% if list_modal_action_buttons %}
+                   <li>{{ list_modal_action_buttons }}</li>
+               {% endif %}
+           {% endblock %}
+       </ul>
+   {% endblock %}
+   ```
+
+These custom templates will include the modal action buttons while allowing you to make other customizations to your admin interface.
+
 ## Testing
 
 To run the tests, execute:
