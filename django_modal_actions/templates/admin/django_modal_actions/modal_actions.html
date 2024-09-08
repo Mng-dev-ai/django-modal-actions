@@ -1,0 +1,37 @@
+<div class="dma-modal-header">
+  <h2>{{ action_name }}</h2>
+  <button class="dma-modal-close">&times;</button>
+</div>
+<div class="dma-modal-body">
+  <p>{{ description }}</p>
+  {% if form %}
+  <form
+    id="dma-modal-form"
+    method="post"
+    action="{% if object %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_action' object.pk action %}{% else %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_list_action' action %}{% endif %}"
+  >
+    {% csrf_token %} {{ form.as_p }} {% if selected_ids %}
+    <input type="hidden" name="selected_ids" value="{{ selected_ids }}" />
+    {% endif %}
+  </form>
+  {% endif %}
+</div>
+<div class="dma-modal-footer">
+  {% if form %}
+  <button type="submit" form="dma-modal-form" class="dma-button default">
+    Confirm
+  </button>
+  <button class="dma-button cancel">Cancel</button>
+  {% else %}
+  <form
+    method="post"
+    action="{% if object %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_action' object.pk action %}{% else %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_list_action' action %}{% endif %}"
+  >
+    {% csrf_token %} {% if selected_ids %}
+    <input type="hidden" name="selected_ids" value="{{ selected_ids }}" />
+    {% endif %}
+    <button type="submit" class="dma-button default">Confirm</button>
+    <button class="dma-button cancel">Cancel</button>
+  </form>
+  {% endif %}
+</div>
