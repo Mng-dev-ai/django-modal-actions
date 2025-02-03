@@ -97,7 +97,7 @@ class ModalActionMixin:
                     {"success": False, "errors": {"__all__": ["Permission denied"]}}
                 )
             if form_class:
-                form = form_class(request.POST)
+                form = form_class(request.POST, request.FILES)
                 if form.is_valid():
                     response = action_func(request, queryset_or_obj, form.cleaned_data)
                     self.message_user(request, str(response), messages.SUCCESS)
