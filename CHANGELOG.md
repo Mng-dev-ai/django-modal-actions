@@ -15,3 +15,9 @@ Initial release!
 ---
 
 - chore(docs): Update folder structure and README.md.
+
+## Version 0.1.3 (February 03, 2025)
+
+---
+
+- fix: add file uploads support for modal forms.
