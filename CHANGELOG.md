@@ -21,3 +21,9 @@ Initial release!
 ---
 
 - fix: add file uploads support for modal forms.
+
+## Version 0.1.4 (March 21, 2025)
+
+---
+
+- feat: add support for conditional fields.
