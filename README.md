@@ -102,8 +102,68 @@ Django Modal Actions is a reusable Django app that provides a convenient way to 
        return f"{obj} has been approved with reason: {form_data['reason']}"
    ```
 
-## Permissions Example
+## Conditional Fields Example
 
+You can create forms with fields that are shown or hidden based on the value of another field. This is useful for creating dynamic forms that adapt to user input. Here's an example:
+
+```python
+from django import forms
+from django_modal_actions import conditional_field
+
+class NotificationForm(forms.Form):
+    notification_type = forms.ChoiceField(
+        label="Notification Type",
+        choices=[
+            ('email', 'Email'),
+            ('sms', 'SMS'),
+            ('none', 'No notification')
+        ],
+        initial='none'
+    )
+    
+    # This field will only be shown when notification_type is 'email'
+    email_address = conditional_field(
+        dependent_field='notification_type',
+        values=['email']
+    )(
+        forms.EmailField(
+            label="Email Address",
+            required=False
+        )
+    )
+    
+    # This field will only be shown when notification_type is 'sms'
+    phone_number = conditional_field(
+        dependent_field='notification_type',
+        values=['sms']
+    )(
+        forms.CharField(
+            label="Phone Number",
+            required=False
+        )
+    )
+
+@admin.register(YourModel)
+class YourModelAdmin(ModalActionMixin, admin.ModelAdmin):
+    modal_actions = ['send_notification']
+
+    @modal_action(
+        modal_header="Send Notification",
+        modal_description="Send a notification to the user",
+        form_class=NotificationForm
+    )
+    def send_notification(self, request, obj, form_data=None):
+        if form_data['notification_type'] == 'email':
+            # Send email notification
+            return f"Email will be sent to {form_data['email_address']}"
+        elif form_data['notification_type'] == 'sms':
+            # Send SMS notification
+            return f"SMS will be sent to {form_data['phone_number']}"
+        else:
+            return "No notification will be sent"
+```
+
+## Permissions Example
 You can add custom permission checks to your modal actions using the `permissions` parameter of the `modal_action` decorator. Here's an example:
 
 ```python

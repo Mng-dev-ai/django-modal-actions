@@ -9,6 +9,7 @@
     id="dma-modal-form"
     method="post"
     action="{% if object %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_action' object.pk action %}{% else %}{% url 'admin:'|add:opts.app_label|add:'_'|add:opts.model_name|add:'_execute_list_action' action %}{% endif %}"
+    data-conditional-fields="{{ conditional_fields|default:'{}' }}"
   >
     {% csrf_token %} {{ form.as_p }} {% if selected_ids %}
     <input type="hidden" name="selected_ids" value="{{ selected_ids }}" />

@@ -5,6 +5,71 @@
     ).appendTo("body");
     var $modalContent = $modal.find(".dma-modal-content");
 
+    // Function to handle conditional fields visibility
+    function handleConditionalFields() {
+      var $form = $("#dma-modal-form");
+      if (!$form.length) return;
+      
+      var conditionalFieldsData = {};
+      try {
+        conditionalFieldsData = JSON.parse($form.attr("data-conditional-fields") || "{}");
+      } catch (e) {
+        console.error("Error parsing conditional fields data:", e);
+        return;
+      }
+      
+      // Process each conditional field
+      $.each(conditionalFieldsData, function(fieldName, config) {
+        var $field = $form.find('[name="' + fieldName + '"]');
+        var $fieldContainer = $field.closest('p');
+        
+        if ($field.length && $fieldContainer.length) {
+          // Get the current value of the dependent field
+          var $dependentField = $form.find('[name="' + config.dependent_field + '"]');
+          
+          if ($dependentField.length) {
+            // For radio buttons and checkboxes
+            if ($dependentField.is(':radio') || $dependentField.is(':checkbox')) {
+              var currentValue = $form.find('[name="' + config.dependent_field + '"]:checked').val();
+              toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
+            } 
+            // For select elements
+            else if ($dependentField.is('select')) {
+              var currentValue = $dependentField.val();
+              toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
+            }
+            // For other input types
+            else {
+              var currentValue = $dependentField.val();
+              toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
+            }
+            
+            // Add event listener to the dependent field
+            $dependentField.on('change', function() {
+              var newValue = null;
+              
+              if ($(this).is(':radio') || $(this).is(':checkbox')) {
+                newValue = $form.find('[name="' + config.dependent_field + '"]:checked').val();
+              } else {
+                newValue = $(this).val();
+              }
+              
+              toggleFieldVisibility($fieldContainer, newValue, config.show_on_values);
+            });
+          }
+        }
+      });
+      
+      // Helper function to toggle field visibility
+      function toggleFieldVisibility($field, currentValue, showOnValues) {
+        if (showOnValues.includes(currentValue)) {
+          $field.show();
+        } else {
+          $field.hide();
+        }
+      }
+    }
+
     $(document).on("click", ".dma-modal-action-button", function (e) {
       e.preventDefault();
       var url = $(this).attr("href");
@@ -20,6 +85,8 @@
       $.get(url, function (data) {
         $modalContent.html(data.content);
         $modal.show();
+        // Initialize conditional fields after modal content is loaded
+        handleConditionalFields();
       });
     });
 

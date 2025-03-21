@@ -18,7 +18,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 
 
 class DjangoModalActionsTests(StaticLiveServerTestCase):
@@ -165,6 +165,104 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
             EC.presence_of_element_located((By.CLASS_NAME, "success"))
         )
         self.assertIn("Object action with form class works", success_message.text)
+
+    def test_conditional_fields(self):
+        user = User.objects.first()
+        self.selenium.get(
+            self.live_server_url + reverse("admin:auth_user_change", args=[user.id])
+        )
+        self.open_modal("CONDITIONAL FIELDS ACTION")
+
+        # Wait for the form to be fully loaded and initial state to be set
+        WebDriverWait(self.selenium, 10).until(
+            EC.presence_of_element_located((By.ID, "id_action_type"))
+        )
+
+        # Check initial state (should be 'none' and both fields hidden)
+        email_field_visible = self.selenium.execute_script(
+            'return django.jQuery("#id_email_address").closest("p").is(":visible");'
+        )
+        phone_field_visible = self.selenium.execute_script(
+            'return django.jQuery("#id_phone_number").closest("p").is(":visible");'
+        )
+        self.assertFalse(email_field_visible, "Email field should be hidden initially")
+        self.assertFalse(phone_field_visible, "Phone field should be hidden initially")
+
+        # Select email type
+        action_type_select = Select(self.selenium.find_element(By.ID, "id_action_type"))
+        action_type_select.select_by_value("email")
+
+        # Wait for the change event to be processed and check visibility
+        WebDriverWait(self.selenium, 10).until(
+            lambda driver: driver.execute_script(
+                'return django.jQuery("#id_email_address").closest("p").is(":visible");'
+            )
+        )
+
+        # Verify email field is visible and phone field is hidden
+        email_field_visible = self.selenium.execute_script(
+            'return django.jQuery("#id_email_address").closest("p").is(":visible");'
+        )
+        phone_field_visible = self.selenium.execute_script(
+            'return django.jQuery("#id_phone_number").closest("p").is(":visible");'
+        )
+        self.assertTrue(
+            email_field_visible,
+            "Email field should be visible when email type is selected",
+        )
+        self.assertFalse(
+            phone_field_visible,
+            "Phone field should be hidden when email type is selected",
+        )
+
+        # Select SMS type
+        action_type_select.select_by_value("sms")
+
+        # Wait for the change event to be processed and check visibility
+        WebDriverWait(self.selenium, 10).until(
+            lambda driver: driver.execute_script(
+                'return django.jQuery("#id_phone_number").closest("p").is(":visible");'
+            )
+        )
+
+        # Verify phone field is visible and email field is hidden
+        email_field_visible = self.selenium.execute_script(
+            'return django.jQuery("#id_email_address").closest("p").is(":visible");'
+        )
+        phone_field_visible = self.selenium.execute_script(
+            'return django.jQuery("#id_phone_number").closest("p").is(":visible");'
+        )
+        self.assertFalse(
+            email_field_visible,
+            "Email field should be hidden when SMS type is selected",
+        )
+        self.assertTrue(
+            phone_field_visible,
+            "Phone field should be visible when SMS type is selected",
+        )
+
+        # Test form submission with phone number
+        phone_field = self.selenium.find_element(By.ID, "id_phone_number")
+        phone_field.send_keys("123-456-7890")
+
+        # Submit the form
+        submit_button = WebDriverWait(self.selenium, 10).until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "#dma-modal-action button[type='submit']")
+            )
+        )
+        self.selenium.execute_script("arguments[0].click();", submit_button)
+
+        # Wait for the modal to close
+        WebDriverWait(self.selenium, 10).until(
+            EC.invisibility_of_element_located((By.ID, "dma-modal-action"))
+        )
+
+        # Check for success message
+        success_message = WebDriverWait(self.selenium, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "success"))
+        )
+        self.assertIn("SMS will be sent to 123-456-7890", success_message.text)
 
 
 if __name__ == "__main__":

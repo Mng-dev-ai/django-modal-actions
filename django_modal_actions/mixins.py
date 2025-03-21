@@ -62,6 +62,17 @@ class ModalActionMixin:
                 or f"Are you sure you want to perform this action on {obj}?"
             )
 
+        conditional_fields = {}
+        if form:
+            for field_name, field in form.fields.items():
+                if hasattr(field, "dependent_field") and hasattr(
+                    field, "show_on_values"
+                ):
+                    conditional_fields[field_name] = {
+                        "dependent_field": field.dependent_field,
+                        "show_on_values": field.show_on_values,
+                    }
+
         context = {
             "object": obj,
             "action": action,
@@ -71,6 +82,7 @@ class ModalActionMixin:
             "opts": self.model._meta,
             "form": form,
             "selected_ids": json.dumps(selected_ids) if obj is None else None,
+            "conditional_fields": json.dumps(conditional_fields),
         }
         content = render_to_string(
             "admin/django_modal_actions/modal_actions.html", context, request
@@ -200,5 +212,14 @@ def modal_action(
         wrapper.permissions = permissions
         wrapper.form_class = form_class
         return wrapper
+
+    return decorator
+
+
+def conditional_field(dependent_field: str, values: List[Any]) -> Callable:
+    def decorator(field):
+        field.dependent_field = dependent_field
+        field.show_on_values = values
+        return field
 
     return decorator
