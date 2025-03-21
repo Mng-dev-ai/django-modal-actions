@@ -1,6 +1,6 @@
 import json
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Type, Union, Tuple
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 from django.contrib import messages
 from django.http import HttpRequest, JsonResponse
