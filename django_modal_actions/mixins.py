@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.urls import path, reverse
 from django.utils.html import format_html
 
+
 class ModalActionMixin:
     modal_actions: List[str] = []
     list_modal_actions: List[str] = []
@@ -64,10 +65,12 @@ class ModalActionMixin:
         conditional_fields = {}
         if form:
             for field_name, field in form.fields.items():
-                if hasattr(field, 'dependent_field') and hasattr(field, 'show_on_values'):
+                if hasattr(field, "dependent_field") and hasattr(
+                    field, "show_on_values"
+                ):
                     conditional_fields[field_name] = {
-                        'dependent_field': field.dependent_field,
-                        'show_on_values': field.show_on_values
+                        "dependent_field": field.dependent_field,
+                        "show_on_values": field.show_on_values,
                     }
 
         context = {
@@ -79,7 +82,7 @@ class ModalActionMixin:
             "opts": self.model._meta,
             "form": form,
             "selected_ids": json.dumps(selected_ids) if obj is None else None,
-            "conditional_fields": json.dumps(conditional_fields)
+            "conditional_fields": json.dumps(conditional_fields),
         }
         content = render_to_string(
             "admin/django_modal_actions/modal_actions.html", context, request
@@ -218,4 +221,5 @@ def conditional_field(dependent_field: str, values: List[Any]) -> Callable:
         field.dependent_field = dependent_field
         field.show_on_values = values
         return field
+
     return decorator
