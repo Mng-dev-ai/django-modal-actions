@@ -1,0 +1,65 @@
+
+[project]
+name = "django-modal-actions"
+version = "0.1.4"
+description = "A Django app for adding modal actions to the admin interface"
+readme = "README.md"
+authors = [
+    {name = "Michael Gendy", email = "nagymichel13@gmail.com"},
+]
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "Django>=3.2",
+]
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = "https://github.com/Mng-dev-ai/django-modal-actions"
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.6.3",
+    "selenium>=4.24.0",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "selenium",
+    "webdriver-manager",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.ruff]
+line-length = 120
+target-version = "py37"
+select = ["E", "F", "I", "D", "N", "S", "C90"]
+# TODO: Why are these here? They are part of .gitignore so ruff should already exclude them?
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+    "venv",
+]
+
+[tool.ruff.isort]
+known-first-party = ["django_modal_actions"]

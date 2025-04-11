@@ -280,7 +280,8 @@ These custom templates will include the modal action buttons while allowing you 
 To run the tests, execute:
 
 ```
-python -m unittest discover django_modal_actions/tests
+pip install -e '.[test]'
+pytest django_modal_actions/tests
 ```
 
 ## Contributing
