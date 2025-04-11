@@ -21,7 +21,7 @@ jobs:
           version: "latest"
       - name: Install Dependencies
         run: |
-          uv pip install -e '.[dev]'
+          uv pip install --system -e '.[dev]'
       - name: Run Ruff
         run: ruff check .
       - name: Run Ruff Format
@@ -46,8 +46,8 @@ jobs:
           version: "latest"
       - name: Install Dependencies
         run: |
-          uv pip install "Django==${{ matrix.django-version }}.*"
-          uv pip install -e '.[test]'
+          uv pip install --system "Django==${{ matrix.django-version }}.*"
+          uv pip install --system -e '.[test]'
       - name: Run Tests
         run: |
           uv run pytest django_modal_actions/tests
