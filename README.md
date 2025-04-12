@@ -4,7 +4,7 @@ Django Modal Actions is a reusable Django app that provides a convenient way to 
 
 <p float="left">
   <img src="screenshots/modal_action_example1.png" width="49%" />
-  <img src="screenshots/modal_action_example2.png" width="49%" /> 
+  <img src="screenshots/modal_action_example2.png" width="49%" />
 </p>
 
 ## Features
@@ -120,7 +120,7 @@ class NotificationForm(forms.Form):
         ],
         initial='none'
     )
-    
+
     # This field will only be shown when notification_type is 'email'
     email_address = conditional_field(
         dependent_field='notification_type',
@@ -131,7 +131,7 @@ class NotificationForm(forms.Form):
             required=False
         )
     )
-    
+
     # This field will only be shown when notification_type is 'sms'
     phone_number = conditional_field(
         dependent_field='notification_type',
@@ -226,7 +226,7 @@ If you need to customize the admin templates while still using the modal actions
    ```
 
 2. Create the custom template files in your app's template directory. For example:
-   
+
    ```
    yourapp/
    └── templates/
