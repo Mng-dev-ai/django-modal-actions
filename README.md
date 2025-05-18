@@ -13,6 +13,7 @@ Django Modal Actions is a reusable Django app that provides a convenient way to 
 - Support for both list-view and object-view actions
 - Customizable modal forms
 - AJAX-based form submission
+- Skip confirmation dialog for immediate action execution
 
 ## Requirements
 
@@ -210,6 +211,47 @@ def approve(self, request, obj, form_data=None):
 ```
 
 In this case, the user must both have the `can_approve_items` permission and be a staff member to see and use the approve action.
+
+## Skip Confirmation Dialog
+
+Sometimes you may want to execute an action immediately without showing a confirmation dialog. You can use the `skip_confirmation` parameter to achieve this:
+
+```python
+from django.contrib import admin
+from django_modal_actions import ModalActionMixin, modal_action
+
+@admin.register(YourModel)
+class YourModelAdmin(ModalActionMixin, admin.ModelAdmin):
+    list_display = ['name', 'status']
+    modal_actions = ['toggle_status']
+    list_modal_actions = ['bulk_toggle_status']
+
+    @modal_action(
+        modal_header="Toggle Status",
+        skip_confirmation=True
+    )
+    def toggle_status(self, request, obj, form_data=None):
+        if obj.status == 'active':
+            obj.status = 'inactive'
+        else:
+            obj.status = 'active'
+        obj.save()
+        return f"{obj} status toggled to {obj.status}"
+
+    @modal_action(
+        modal_header="Bulk Toggle Status",
+        skip_confirmation=True
+    )
+    def bulk_toggle_status(self, request, queryset, form_data=None):
+        for obj in queryset:
+            obj.status = 'inactive' if obj.status == 'active' else 'active'
+            obj.save()
+        return f"Toggled status for {queryset.count()} items"
+```
+
+In this example, both actions will execute immediately when clicked, without showing a confirmation modal. The page will reload automatically after the action completes.
+
+**Important Note**: You cannot use `skip_confirmation=True` together with `form_class`. The skip confirmation feature is designed for actions that don't require any user input. If you need to collect form data, the modal must be shown to display the form.
 
 ## Custom Admin Templates
 
