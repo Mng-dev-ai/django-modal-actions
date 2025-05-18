@@ -83,10 +83,20 @@
         url += "?selected_ids=" + JSON.stringify(selectedIds);
       }
       $.get(url, function (data) {
-        $modalContent.html(data.content);
-        $modal.show();
-        // Initialize conditional fields after modal content is loaded
-        handleConditionalFields();
+        if (data.success !== undefined) {
+          // Skip confirmation case - action was executed directly
+          if (data.success) {
+            location.reload();
+          } else if (data.errors) {
+            displayErrors(data.errors);
+          }
+        } else if (data.content) {
+          // Normal case - show modal with confirmation
+          $modalContent.html(data.content);
+          $modal.show();
+          // Initialize conditional fields after modal content is loaded
+          handleConditionalFields();
+        }
       });
     });
 

@@ -46,6 +46,11 @@ class ModalActionMixin:
     ) -> JsonResponse:
         obj = self.get_object(request, object_id) if object_id else None
         action_func: Callable = getattr(self, action)
+        skip_confirmation: bool = getattr(action_func, "skip_confirmation", False)
+
+        if skip_confirmation:
+            return self.execute_modal_action(request, action, object_id)
+
         form_class: Optional[Type] = getattr(action_func, "form_class", None)
         form = form_class(request.POST or None) if form_class else None
 
@@ -201,7 +206,13 @@ def modal_action(
     modal_description: Optional[str] = None,
     permissions: Optional[Union[Callable, List[Callable]]] = None,
     form_class: Optional[Type] = None,
+    skip_confirmation: bool = False,
 ):
+    if form_class and skip_confirmation:
+        raise ValueError(
+            "Cannot use form_class with skip_confirmation. Skip confirmation means no modal and no form."
+        )
+
     def decorator(func):
         @wraps(func)
         def wrapper(self, request, queryset_or_obj, form_data=None):
@@ -211,6 +222,7 @@ def modal_action(
         wrapper.modal_description = modal_description
         wrapper.permissions = permissions
         wrapper.form_class = form_class
+        wrapper.skip_confirmation = skip_confirmation
         return wrapper
 
     return decorator
