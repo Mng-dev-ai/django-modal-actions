@@ -44,7 +44,7 @@ class UserAdmin(ModalActionMixin, BaseUserAdmin):
         "object_action_skip_confirmation",
     ]
     list_modal_actions = [
-        "list_action", 
+        "list_action",
         "list_action_with_form_class",
         "list_action_skip_confirmation",
     ]
@@ -82,16 +82,12 @@ class UserAdmin(ModalActionMixin, BaseUserAdmin):
         return "Conditional fields action works"
 
     @modal_action(
-        modal_header="Object Action Skip Confirmation", 
-        skip_confirmation=True
+        modal_header="Object Action Skip Confirmation", skip_confirmation=True
     )
     def object_action_skip_confirmation(self, request, obj, form_data=None):
         return "Object action without confirmation works"
 
-    @modal_action(
-        modal_header="List Action Skip Confirmation", 
-        skip_confirmation=True
-    )
+    @modal_action(modal_header="List Action Skip Confirmation", skip_confirmation=True)
     def list_action_skip_confirmation(self, request, queryset, form_data=None):
         return f"List action without confirmation works on {queryset.count()} items"
 

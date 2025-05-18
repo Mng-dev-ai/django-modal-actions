@@ -269,38 +269,40 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:auth_user_change", args=[user.id])
         )
-        
+
         # Click the action button
         modal_button = WebDriverWait(self.selenium, 10).until(
-            EC.element_to_be_clickable((By.LINK_TEXT, "OBJECT ACTION SKIP CONFIRMATION"))
+            EC.element_to_be_clickable(
+                (By.LINK_TEXT, "OBJECT ACTION SKIP CONFIRMATION")
+            )
         )
         modal_button.click()
-        
+
         # Page should reload directly without showing modal
         # Check for success message
         success_message = WebDriverWait(self.selenium, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "success"))
         )
         self.assertIn("Object action without confirmation works", success_message.text)
-        
+
         # Verify modal was never shown
         modal = self.selenium.find_element(By.ID, "dma-modal-action")
         self.assertFalse(modal.is_displayed())
 
     def test_skip_confirmation_list_action(self):
         self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
-        
+
         # Select some users
         checkboxes = self.selenium.find_elements(By.NAME, "_selected_action")
         if checkboxes:
             checkboxes[0].click()
-        
+
         # Click the action button
         modal_button = WebDriverWait(self.selenium, 10).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "LIST ACTION SKIP CONFIRMATION"))
         )
         modal_button.click()
-        
+
         # Page should reload directly without showing modal
         # Check for success message
         success_message = WebDriverWait(self.selenium, 10).until(
@@ -312,14 +314,14 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         """Test that using form_class with skip_confirmation raises a ValueError"""
         from django_modal_actions.mixins import modal_action
         from django_modal_actions.tests.admin import CustomForm
-        
+
         with self.assertRaises(ValueError) as cm:
+
             @modal_action(form_class=CustomForm, skip_confirmation=True)
             def invalid_action(self, request, obj, form_data=None):
                 pass
-        
-        self.assertIn("Cannot use form_class with skip_confirmation", str(cm.exception))
 
+        self.assertIn("Cannot use form_class with skip_confirmation", str(cm.exception))
 
 
 if __name__ == "__main__":
