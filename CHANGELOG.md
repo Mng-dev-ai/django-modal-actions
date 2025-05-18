@@ -27,3 +27,10 @@ Initial release!
 ---
 
 - feat: add support for conditional fields.
+
+## Version 0.1.5 (May 19, 2025)
+
+---
+
+- feat: Add support to skip confirmation.
+- fix: Install setuptools and use python -m build in CD workflow.
