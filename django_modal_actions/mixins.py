@@ -104,12 +104,14 @@ class ModalActionMixin:
     ) -> JsonResponse:
         if self.modal_action_exception_handling:
             try:
-                return self.do_execute_modal_action(request, action, object_id=object_id)
+                return self.do_execute_modal_action(
+                    request, action, object_id=object_id
+                )
             except Exception as e:
                 return JsonResponse({"success": False, "errors": {"__all__": [str(e)]}})
         else:
             return self.do_execute_modal_action(request, action, object_id=object_id)
-    
+
     def do_execute_modal_action(
         self, request: HttpRequest, action: str, object_id: Optional[str] = None
     ) -> JsonResponse:
@@ -122,9 +124,7 @@ class ModalActionMixin:
             selected_ids = json.loads(request.POST.get("selected_ids", "[]"))
             queryset_or_obj = self.model.objects.filter(pk__in=selected_ids)
 
-        if not self.has_action_permission(
-            request, action, obj if object_id else None
-        ):
+        if not self.has_action_permission(request, action, obj if object_id else None):
             return JsonResponse(
                 {"success": False, "errors": {"__all__": ["Permission denied"]}}
             )
