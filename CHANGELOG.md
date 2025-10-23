@@ -34,3 +34,9 @@ Initial release!
 
 - feat: Add support to skip confirmation.
 - fix: Install setuptools and use python -m build in CD workflow.
+
+## Version 0.1.6 (Oct 23, 2025)
+
+---
+
+- feat: Add loading states and comprehensive modal accessibility.
