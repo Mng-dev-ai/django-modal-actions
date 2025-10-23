@@ -246,3 +246,71 @@
     font-size: 0.8rem;
   }
 }
+
+.dma-spinner {
+  display: none;
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: dma-spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@media (prefers-color-scheme: light) {
+  .dma-spinner {
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    border-top-color: #000;
+  }
+}
+
+@keyframes dma-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.dma-button.dma-loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.dma-button.dma-loading .dma-btn-text {
+  opacity: 0.8;
+}
+
+.dma-button.dma-loading .dma-spinner {
+  display: inline-block;
+}
+
+.dma-button:disabled,
+.dma-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--button-bg);
+}
+
+.dma-button:disabled:hover,
+.dma-button[disabled]:hover {
+  transform: none;
+  box-shadow: none;
+  background-color: var(--button-bg);
+}
+
+.dma-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
