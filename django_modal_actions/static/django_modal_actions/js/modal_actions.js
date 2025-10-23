@@ -1,9 +1,10 @@
 (function ($) {
   $(document).ready(function () {
     var $modal = $(
-      '<div id="dma-modal-action" class="dma-modal"><div class="dma-modal-content"></div></div>',
+      '<div id="dma-modal-action" class="dma-modal" role="dialog" aria-modal="true"><div class="dma-modal-content"></div></div>',
     ).appendTo("body");
     var $modalContent = $modal.find(".dma-modal-content");
+    var lastFocusedElement = null;
 
     // Function to handle conditional fields visibility
     function handleConditionalFields() {
@@ -31,17 +32,17 @@
             // For radio buttons and checkboxes
             if ($dependentField.is(':radio') || $dependentField.is(':checkbox')) {
               var currentValue = $form.find('[name="' + config.dependent_field + '"]:checked').val();
-              toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
+              _toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
             }
             // For select elements
             else if ($dependentField.is('select')) {
               var currentValue = $dependentField.val();
-              toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
+              _toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
             }
             // For other input types
             else {
               var currentValue = $dependentField.val();
-              toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
+              _toggleFieldVisibility($fieldContainer, currentValue, config.show_on_values);
             }
 
             // Add event listener to the dependent field
@@ -54,24 +55,76 @@
                 newValue = $(this).val();
               }
 
-              toggleFieldVisibility($fieldContainer, newValue, config.show_on_values);
+              _toggleFieldVisibility($fieldContainer, newValue, config.show_on_values);
             });
           }
         }
       });
+    }
 
-      // Helper function to toggle field visibility
-      function toggleFieldVisibility($field, currentValue, showOnValues) {
-        if (showOnValues.includes(currentValue)) {
-          $field.show();
-        } else {
-          $field.hide();
+    function _toggleFieldVisibility($field, currentValue, showOnValues) {
+      if (showOnValues.includes(currentValue)) {
+        $field.show();
+      } else {
+        $field.hide();
+      }
+    }
+
+    function _getFocusableElements($container) {
+      return $container.find(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ).filter(':visible');
+    }
+
+    function _trapFocus() {
+      var focusableElements = _getFocusableElements($modal);
+      if (focusableElements.length === 0) {
+        $modal.off('keydown.focustrap');
+        return;
+      }
+
+      if (focusableElements.length === 1) {
+        $modal.off('keydown.focustrap').on('keydown.focustrap', function(e) {
+          if (e.key === 'Tab' || e.keyCode === 9) {
+            e.preventDefault();
+          }
+        });
+        return;
+      }
+
+      var firstFocusable = focusableElements.first();
+      var lastFocusable = focusableElements.last();
+
+      $modal.off('keydown.focustrap').on('keydown.focustrap', function(e) {
+        if (e.key === 'Tab' || e.keyCode === 9) {
+          if (e.shiftKey) {
+            if (document.activeElement === firstFocusable[0]) {
+              e.preventDefault();
+              lastFocusable.focus();
+            }
+          } else {
+            if (document.activeElement === lastFocusable[0]) {
+              e.preventDefault();
+              firstFocusable.focus();
+            }
+          }
         }
+      });
+    }
+
+    function _closeModal() {
+      $modal.hide();
+      $modal.off('keydown.focustrap');
+      $(document).off('keydown.dmaModal');
+      if (lastFocusedElement) {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
       }
     }
 
     $(document).on("click", ".dma-modal-action-button", function (e) {
       e.preventDefault();
+      lastFocusedElement = this;
       var url = $(this).attr("href");
       var isListAction = url.includes("list-modal-action");
 
@@ -84,18 +137,45 @@
       }
       $.get(url, function (data) {
         if (data.success !== undefined) {
-          // Skip confirmation case - action was executed directly
           if (data.success) {
             location.reload();
           } else if (data.errors) {
-            displayErrors(data.errors);
+            _displayErrors(data.errors);
           }
         } else if (data.content) {
-          // Normal case - show modal with confirmation
           $modalContent.html(data.content);
+
+          var $heading = $modalContent.find("h2");
+          if ($heading.length) {
+            var headingId = "dma-modal-heading-" + Date.now();
+            $heading.attr("id", headingId);
+            $modal.attr("aria-labelledby", headingId);
+          } else {
+            $modal.removeAttr("aria-labelledby");
+            var modalTitle = $modalContent.find("h1, h2, h3").first().text() || "Dialog";
+            $modal.attr("aria-label", modalTitle);
+          }
+
           $modal.show();
-          // Initialize conditional fields after modal content is loaded
           handleConditionalFields();
+
+          var $firstFocusable = _getFocusableElements($modal).first();
+          if ($firstFocusable.length) {
+            $firstFocusable.focus();
+          } else {
+            $modal.find('h2').attr('tabindex', '-1').focus();
+          }
+
+          _trapFocus();
+
+          $(document).off('keydown.dmaModal').on('keydown.dmaModal', function(e) {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+              if ($modal.is(':visible')) {
+                e.preventDefault();
+                _closeModal();
+              }
+            }
+          });
         }
       });
     });
@@ -105,12 +185,21 @@
       "#dma-modal-action .cancel, #dma-modal-action .dma-modal-close",
       function (e) {
         e.preventDefault();
-        $modal.hide();
+        _closeModal();
       },
     );
 
-    function displayErrors(errors) {
+    function _displayErrors(errors) {
       $(".dma-errorlist, .dma-alert-danger").remove();
+
+      var errorCount = Object.keys(errors).length;
+      var $statusMessage = $(".dma-status-message");
+      if ($statusMessage.length) {
+        $statusMessage.text("");
+        setTimeout(function() {
+          $statusMessage.text("Form submission failed. " + errorCount + " error" + (errorCount > 1 ? "s" : "") + " found. Please review and correct.");
+        }, 100);
+      }
 
       $.each(errors, function (field, messages) {
         if (field === "__all__") {
@@ -121,7 +210,7 @@
           $("#dma-modal-action form").prepend($generalError);
         } else {
           var $field = $("#id_" + field);
-          var $errorList = $('<ul class="dma-errorlist"></ul>');
+          var $errorList = $('<ul class="dma-errorlist" role="alert"></ul>');
           $.each(messages, function (index, message) {
             $errorList.append($("<li></li>").text(message));
           });
@@ -135,6 +224,10 @@
         );
         $("#dma-modal-action form").prepend($generalError);
       }
+
+      if ($modal.is(':visible')) {
+        _trapFocus();
+      }
     }
 
     $(document).on("submit", "#dma-modal-action form", function (e) {
@@ -142,6 +235,10 @@
       var form = $(this);
       var url = form.attr("action");
       var formData = new FormData(form[0]);
+
+      var $confirmBtn = form.closest("#dma-modal-action").find(".dma-confirm-btn");
+      $confirmBtn.prop("disabled", true).addClass("dma-loading").attr("aria-busy", "true");
+      $(".dma-status-message").text("Processing your request, please wait...");
 
       var selectedIds = form.find('input[name="selected_ids"]').val();
       if (selectedIds) {
@@ -154,25 +251,36 @@
         processData: false,
         contentType: false,
         dataType: "json",
+        timeout: 30000,
         success: function (data) {
           if (data.success) {
-            $modal.hide();
+            _closeModal();
             location.reload();
           } else if (data.errors) {
-            displayErrors(data.errors);
+            $confirmBtn.prop("disabled", false).removeClass("dma-loading").attr("aria-busy", "false");
+            _displayErrors(data.errors);
           }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-          displayErrors({
-            __all__: ["An unexpected error occurred. Please try again."],
-          });
+          $confirmBtn.prop("disabled", false).removeClass("dma-loading").attr("aria-busy", "false");
+          if (textStatus === 'timeout') {
+            _displayErrors({
+              __all__: ["Request timed out. Please try again."],
+            });
+          } else {
+            _displayErrors({
+              __all__: ["An unexpected error occurred. Please try again."],
+            });
+          }
         },
       });
     });
 
     $(window).on("click", function (e) {
       if ($(e.target).is(".dma-modal")) {
-        $modal.hide();
+        if (!$(".dma-confirm-btn").hasClass("dma-loading")) {
+          _closeModal();
+        }
       }
     });
   });

@@ -1,6 +1,6 @@
 <div class="dma-modal-header">
   <h2>{{ action_name }}</h2>
-  <button class="dma-modal-close">&times;</button>
+  <button class="dma-modal-close" aria-label="Close dialog">&times;</button>
 </div>
 <div class="dma-modal-body">
   <p>{{ description }}</p>
@@ -19,8 +19,9 @@
 </div>
 <div class="dma-modal-footer">
   {% if form %}
-  <button type="submit" form="dma-modal-form" class="dma-button default">
-    Confirm
+  <button type="submit" form="dma-modal-form" class="dma-button default dma-confirm-btn">
+    <span class="dma-btn-text">Confirm</span>
+    <span class="dma-spinner"></span>
   </button>
   <button class="dma-button cancel">Cancel</button>
   {% else %}
@@ -31,8 +32,12 @@
     {% csrf_token %} {% if selected_ids %}
     <input type="hidden" name="selected_ids" value="{{ selected_ids }}" />
     {% endif %}
-    <button type="submit" class="dma-button default">Confirm</button>
+    <button type="submit" class="dma-button default dma-confirm-btn">
+      <span class="dma-btn-text">Confirm</span>
+      <span class="dma-spinner"></span>
+    </button>
     <button class="dma-button cancel">Cancel</button>
   </form>
   {% endif %}
 </div>
+<div aria-live="polite" aria-atomic="true" class="dma-sr-only dma-status-message"></div>

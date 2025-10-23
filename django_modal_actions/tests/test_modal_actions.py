@@ -103,6 +103,105 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         )
         self.assertIn("Name cannot be 'bad'", error_list.text)
 
+    def test_button_disables_on_form_submission(self):
+        self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.open_modal("LIST ACTION WITH FORM CLASS")
+
+        name_field = WebDriverWait(self.selenium, 10).until(
+            EC.presence_of_element_located((By.ID, "id_name"))
+        )
+        name_field.clear()
+        name_field.send_keys("good_name")
+
+        submit_button = WebDriverWait(self.selenium, 10).until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "#dma-modal-action button[type='submit']")
+            )
+        )
+
+        self.assertFalse(submit_button.get_attribute("disabled"))
+
+        was_disabled = self.selenium.execute_script(
+            """
+            var $button = django.jQuery(arguments[0]);
+            $button.click();
+            return $button.prop('disabled');
+        """,
+            submit_button,
+        )
+
+        self.assertTrue(was_disabled)
+
+    def test_spinner_visible_during_submission(self):
+        self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.open_modal("LIST ACTION WITH FORM CLASS")
+
+        name_field = WebDriverWait(self.selenium, 10).until(
+            EC.presence_of_element_located((By.ID, "id_name"))
+        )
+        name_field.clear()
+        name_field.send_keys("good_name")
+
+        spinner = WebDriverWait(self.selenium, 10).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, ".dma-confirm-btn .dma-spinner")
+            )
+        )
+
+        is_hidden_initially = self.selenium.execute_script(
+            'return django.jQuery(arguments[0]).css("display") === "none";', spinner
+        )
+        self.assertTrue(is_hidden_initially)
+
+        submit_button = WebDriverWait(self.selenium, 10).until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "#dma-modal-action button[type='submit']")
+            )
+        )
+
+        was_visible = self.selenium.execute_script(
+            """
+            var $button = django.jQuery(arguments[0]);
+            $button.click();
+            var $spinner = django.jQuery('.dma-confirm-btn .dma-spinner');
+            var display = $spinner.css('display');
+            return display === 'inline-block' || display === 'inline' || $spinner.is(':visible');
+        """,
+            submit_button,
+        )
+
+        self.assertTrue(was_visible)
+
+    def test_aria_busy_attribute_during_submission(self):
+        self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.open_modal("LIST ACTION WITH FORM CLASS")
+
+        name_field = WebDriverWait(self.selenium, 10).until(
+            EC.presence_of_element_located((By.ID, "id_name"))
+        )
+        name_field.clear()
+        name_field.send_keys("good_name")
+
+        submit_button = WebDriverWait(self.selenium, 10).until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "#dma-modal-action button[type='submit']")
+            )
+        )
+
+        initial_aria_busy = submit_button.get_attribute("aria-busy")
+        self.assertIn(initial_aria_busy, [None, "false"])
+
+        aria_busy_was_true = self.selenium.execute_script(
+            """
+            var $button = django.jQuery(arguments[0]);
+            $button.click();
+            return $button.attr('aria-busy') === 'true';
+        """,
+            submit_button,
+        )
+
+        self.assertTrue(aria_busy_was_true)
+
     def test_form_submission_valid_input(self):
         self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
         self.open_modal("LIST ACTION WITH FORM CLASS")
