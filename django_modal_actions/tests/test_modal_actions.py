@@ -121,11 +121,14 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
 
         self.assertFalse(submit_button.get_attribute("disabled"))
 
-        was_disabled = self.selenium.execute_script("""
+        was_disabled = self.selenium.execute_script(
+            """
             var $button = django.jQuery(arguments[0]);
             $button.click();
             return $button.prop('disabled');
-        """, submit_button)
+        """,
+            submit_button,
+        )
 
         self.assertTrue(was_disabled)
 
@@ -156,13 +159,16 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
             )
         )
 
-        was_visible = self.selenium.execute_script("""
+        was_visible = self.selenium.execute_script(
+            """
             var $button = django.jQuery(arguments[0]);
             $button.click();
             var $spinner = django.jQuery('.dma-confirm-btn .dma-spinner');
             var display = $spinner.css('display');
             return display === 'inline-block' || display === 'inline' || $spinner.is(':visible');
-        """, submit_button)
+        """,
+            submit_button,
+        )
 
         self.assertTrue(was_visible)
 
@@ -185,11 +191,14 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         initial_aria_busy = submit_button.get_attribute("aria-busy")
         self.assertIn(initial_aria_busy, [None, "false"])
 
-        aria_busy_was_true = self.selenium.execute_script("""
+        aria_busy_was_true = self.selenium.execute_script(
+            """
             var $button = django.jQuery(arguments[0]);
             $button.click();
             return $button.attr('aria-busy') === 'true';
-        """, submit_button)
+        """,
+            submit_button,
+        )
 
         self.assertTrue(aria_busy_was_true)
 
