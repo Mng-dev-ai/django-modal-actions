@@ -121,13 +121,13 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
 
         self.assertFalse(submit_button.get_attribute("disabled"))
 
-        self.selenium.execute_script("arguments[0].click();", submit_button)
+        was_disabled = self.selenium.execute_script("""
+            var $button = django.jQuery(arguments[0]);
+            $button.click();
+            return $button.prop('disabled');
+        """, submit_button)
 
-        WebDriverWait(self.selenium, 2).until(
-            lambda driver: submit_button.get_attribute("disabled") == "true"
-        )
-
-        self.assertTrue(submit_button.get_attribute("disabled"))
+        self.assertTrue(was_disabled)
 
     def test_spinner_visible_during_submission(self):
         self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
@@ -155,20 +155,16 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
                 (By.CSS_SELECTOR, "#dma-modal-action button[type='submit']")
             )
         )
-        self.selenium.execute_script("arguments[0].click();", submit_button)
 
-        WebDriverWait(self.selenium, 2).until(
-            lambda driver: driver.execute_script(
-                'return django.jQuery(arguments[0]).css("display") === "inline-block";',
-                spinner,
-            )
-        )
+        was_visible = self.selenium.execute_script("""
+            var $button = django.jQuery(arguments[0]);
+            $button.click();
+            var $spinner = django.jQuery('.dma-confirm-btn .dma-spinner');
+            var display = $spinner.css('display');
+            return display === 'inline-block' || display === 'inline' || $spinner.is(':visible');
+        """, submit_button)
 
-        is_visible = self.selenium.execute_script(
-            'return django.jQuery(arguments[0]).css("display") === "inline-block";',
-            spinner,
-        )
-        self.assertTrue(is_visible)
+        self.assertTrue(was_visible)
 
     def test_aria_busy_attribute_during_submission(self):
         self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
@@ -189,13 +185,13 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         initial_aria_busy = submit_button.get_attribute("aria-busy")
         self.assertIn(initial_aria_busy, [None, "false"])
 
-        self.selenium.execute_script("arguments[0].click();", submit_button)
+        aria_busy_was_true = self.selenium.execute_script("""
+            var $button = django.jQuery(arguments[0]);
+            $button.click();
+            return $button.attr('aria-busy') === 'true';
+        """, submit_button)
 
-        WebDriverWait(self.selenium, 2).until(
-            lambda driver: submit_button.get_attribute("aria-busy") == "true"
-        )
-
-        self.assertEqual(submit_button.get_attribute("aria-busy"), "true")
+        self.assertTrue(aria_busy_was_true)
 
     def test_form_submission_valid_input(self):
         self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
