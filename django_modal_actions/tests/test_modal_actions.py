@@ -140,12 +140,13 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         name_field.send_keys("good_name")
 
         spinner = WebDriverWait(self.selenium, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".dma-confirm-btn .dma-spinner"))
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, ".dma-confirm-btn .dma-spinner")
+            )
         )
 
         is_hidden_initially = self.selenium.execute_script(
-            'return django.jQuery(arguments[0]).css("display") === "none";',
-            spinner
+            'return django.jQuery(arguments[0]).css("display") === "none";', spinner
         )
         self.assertTrue(is_hidden_initially)
 
@@ -159,13 +160,13 @@ class DjangoModalActionsTests(StaticLiveServerTestCase):
         WebDriverWait(self.selenium, 2).until(
             lambda driver: driver.execute_script(
                 'return django.jQuery(arguments[0]).css("display") === "inline-block";',
-                spinner
+                spinner,
             )
         )
 
         is_visible = self.selenium.execute_script(
             'return django.jQuery(arguments[0]).css("display") === "inline-block";',
-            spinner
+            spinner,
         )
         self.assertTrue(is_visible)
 
