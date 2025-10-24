@@ -15,6 +15,11 @@ class ModalActionMixin:
     change_form_template: str = "admin/django_modal_actions/change_form.html"
     change_list_template: str = "admin/django_modal_actions/change_list.html"
 
+    # This option returns exception names values directly in the browser.
+    # If you want exceptions to occur server-side, switch to False.
+    # TODO: Consider to disable this as default
+    modal_action_exception_handling = True
+
     def get_urls(self) -> List[path]:
         urls: List[path] = super().get_urls()
         custom_urls = [
@@ -97,34 +102,42 @@ class ModalActionMixin:
     def execute_modal_action(
         self, request: HttpRequest, action: str, object_id: Optional[str] = None
     ) -> JsonResponse:
+        if self.modal_action_exception_handling:
+            try:
+                return self.do_execute_modal_action(
+                    request, action, object_id=object_id
+                )
+            except Exception as e:
+                return JsonResponse({"success": False, "errors": {"__all__": [str(e)]}})
+        else:
+            return self.do_execute_modal_action(request, action, object_id=object_id)
+
+    def do_execute_modal_action(
+        self, request: HttpRequest, action: str, object_id: Optional[str] = None
+    ) -> JsonResponse:
         action_func: Callable = getattr(self, action)
         form_class: Optional[Type] = getattr(action_func, "form_class", None)
-        try:
-            if object_id:
-                obj = self.get_object(request, object_id)
-                queryset_or_obj = obj
-            else:
-                selected_ids = json.loads(request.POST.get("selected_ids", "[]"))
-                queryset_or_obj = self.model.objects.filter(pk__in=selected_ids)
+        if object_id:
+            obj = self.get_object(request, object_id)
+            queryset_or_obj = obj
+        else:
+            selected_ids = json.loads(request.POST.get("selected_ids", "[]"))
+            queryset_or_obj = self.model.objects.filter(pk__in=selected_ids)
 
-            if not self.has_action_permission(
-                request, action, obj if object_id else None
-            ):
-                return JsonResponse(
-                    {"success": False, "errors": {"__all__": ["Permission denied"]}}
-                )
-            if form_class:
-                form = form_class(request.POST, request.FILES)
-                if form.is_valid():
-                    response = action_func(request, queryset_or_obj, form.cleaned_data)
-                    self.message_user(request, str(response), messages.SUCCESS)
-                    return JsonResponse({"success": True})
-                return JsonResponse({"success": False, "errors": form.errors})
-            response = action_func(request, queryset_or_obj)
-            self.message_user(request, str(response), messages.SUCCESS)
-            return JsonResponse({"success": True})
-        except Exception as e:
-            return JsonResponse({"success": False, "errors": {"__all__": [str(e)]}})
+        if not self.has_action_permission(request, action, obj if object_id else None):
+            return JsonResponse(
+                {"success": False, "errors": {"__all__": ["Permission denied"]}}
+            )
+        if form_class:
+            form = form_class(request.POST, request.FILES)
+            if form.is_valid():
+                response = action_func(request, queryset_or_obj, form.cleaned_data)
+                self.message_user(request, str(response), messages.SUCCESS)
+                return JsonResponse({"success": True})
+            return JsonResponse({"success": False, "errors": form.errors})
+        response = action_func(request, queryset_or_obj)
+        self.message_user(request, str(response), messages.SUCCESS)
+        return JsonResponse({"success": True})
 
     def get_modal_action_buttons(self, obj=None) -> str:
         buttons: List[str] = []
